@@ -67,7 +67,7 @@ export default function Header() {
     if (!profile) return;
     const fetchNotifications = async () => {
       try {
-        const res = await api.get(`/notifications`);
+        const res = await api.get(`/notifications/`);
         if (Array.isArray(res.data)) setNotifications(res.data);
       } catch {
         toast.error("Không thể tải thông báo", { position: "bottom-left" });
