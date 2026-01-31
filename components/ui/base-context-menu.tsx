@@ -249,7 +249,7 @@ function ContextMenuPositioner({ ...props }: React.ComponentProps<typeof Context
   );
 }
 
-function ContextMenuPortal({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Positioner>) {
+function ContextMenuPortal({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Portal>) {
   return <ContextMenuPrimitive.Portal data-slot="context-menu-portal" {...props} />;
 }
 
