@@ -57,6 +57,8 @@ export default function Header() {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) setMobileMenuOpen(false);
     };
+    console.log("🔍 API_URL at runtime:", process.env.NEXT_PUBLIC_API_URL);
+    console.log("🔍 WS_URL at runtime:", process.env.NEXT_PUBLIC_WS_URL);
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
