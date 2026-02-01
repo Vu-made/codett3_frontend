@@ -186,7 +186,7 @@ export default function Profile() {
   return (
     <div className="w-full h-full overflow-auto text-[#333] font-sans">
       <div className="max-w-screen mx-auto pt-5 px-4 sm:px-10 lg:px-20 flex flex-col md:flex-row gap-8">
-        <div className="md:w-1/4 w-full sticky top-4 self-start space-y-6">
+        <div className="md:w-1/4 w-full lg:sticky top-4 self-start space-y-6">
           <div className="bg-white border border-[#d1d1d1] text-center">
             <div className="flex flex-col items-center p-6">
               <UserAvatar email={user.email} size={120} />
