@@ -33,7 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" data-theme="dark">
+    <html lang="vi">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <TooltipProvider delay={300}>
           <MainContent>{children}</MainContent>

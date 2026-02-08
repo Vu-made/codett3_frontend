@@ -287,7 +287,7 @@ function ContestSummaryContent({ contest }: { contest: Contest }) {
           Xem chi tiết <ChevronRight size={13} />
         </Link>
         <div
-          className="btn btn-sm btn-danger mt-3 px-3 py-1 text-white bg-red-600 hover:bg-red-700 cursor-pointer"
+          className="mt-3 text-xs text-gray-400 hover:text-red-500 transition-colors duration-200 text-center cursor-pointer select-none"
           title="Rời khỏi contest"
           onClick={async () => {
             await api.post("contest/auth/leave");
