@@ -1,60 +1,22 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname} from "next/navigation";
 import Link from "next/link";
-import api from "@/lib/api";
 import clsx from "clsx";
 
-interface ProblemItem {
-  id: number;
-  title: string;
-  display_id?: string;
-}
-
-interface Contest {
-  id: string;
-  title: string;
-  description: string;
-  start_time: string | null;
-  end_time: string | null;
-  time_mode: string;
-  realtime_rank: boolean;
-  status: boolean;
-  problems: ProblemItem[];
-  created_at: string;
-}
-
-const ContestContext = createContext<Contest | null>(null);
-export const useContest = () => useContext(ContestContext);
+import { useContest } from "@/hooks/useContest";
 
 export default function ContestLayout({ children }: { children: React.ReactNode }) {
-  const { id_contest } = useParams();
   const pathname = usePathname();
-  const [contest, setContest] = useState<Contest | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { contest, loading } = useContest();
   const [now, setNow] = useState(new Date());
-  const router = useRouter();
+
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  useEffect(() => {
-    const fetchContest = async () => {
-      try {
-        const res = await api.get(`/contest/${id_contest}`);
-        setContest(res.data);
-      } catch (err) {
-        console.log(err);
-        router.push("/contests");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchContest();
-  }, [id_contest,router]);
 
   const formatCountdown = (ms: number) => {
     if (ms <= 0) return "00h:00m:00s";
@@ -109,6 +71,7 @@ export default function ContestLayout({ children }: { children: React.ReactNode 
   }
 
   const tabs = [
+    { key: "", label: "Thông tin", icon: "fa-solid fa-info-circle" },
     { key: "problems", label: "Bài tập", icon: "fa-solid fa-code" },
     { key: "ranking", label: "Bảng xếp hạng", icon: "fa-solid fa-ranking-star" },
   ];
@@ -116,8 +79,7 @@ export default function ContestLayout({ children }: { children: React.ReactNode 
   const activeTab = tabs.find((t) => pathname.endsWith(`/${t.key}`))?.key || "";
 
   return (
-    <ContestContext.Provider value={contest}>
-      <div className="h-full flex flex-col bg-white text-[#24292e] font-['Consolas','Courier_New','monospace'] select-none">
+    <div className="h-full flex flex-col bg-white text-[#24292e] font-['Consolas','Courier_New','monospace'] select-none">
         <header className="h-10 border-b border-gray-300 bg-[#f3f4f6] flex items-center justify-between px-4 text-sm">
           <div className="flex items-center gap-2 text-gray-600 text-[12px]">
             <Link
@@ -127,12 +89,6 @@ export default function ContestLayout({ children }: { children: React.ReactNode 
               Kỳ thi
             </Link>
             <span className="text-gray-400">›</span>
-            <Link
-              href={`/contests/${id_contest}`}
-              className="text-blue-600 hover:underline hover:text-blue-700 transition-colors"
-            >
-              {contest.title}
-            </Link>
           </div>
 
           <div
@@ -144,7 +100,7 @@ export default function ContestLayout({ children }: { children: React.ReactNode 
         </header>
 
         <main className="flex-1 flex flex-col overflow-hidden px-10 mt-3 bg-white">
-          <div className="border-b border-gray-300 bg-white px-8 flex items-center justify-between">
+          <div className="border-b border-blue-200 bg-white px-8 flex items-center justify-between">
             <h1 className="text-xl font-bold text-[#005FB8]">{contest.title}</h1>
             <nav className="flex">
               {tabs.map((tab) => {
@@ -152,7 +108,7 @@ export default function ContestLayout({ children }: { children: React.ReactNode 
                 return (
                   <Link
                     key={tab.key}
-                    href={`/contests/${id_contest}/${tab.key}`}
+                    href={`/contests/gui/${tab.key}`}
                     className={clsx(
                       "px-4 py-2 rounded-t-md text-sm font-medium flex items-center gap-2 transition-all border-b-2",
                       active
@@ -171,6 +127,5 @@ export default function ContestLayout({ children }: { children: React.ReactNode 
           <div className="flex-1 overflow-auto bg-white px-8 py-5 h-full">{children}</div>
         </main>
       </div>
-    </ContestContext.Provider>
-  );
-}
+    );
+  }

@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import api from "@/lib/api";
 import Link from "next/link";
+import { useContest } from "@/hooks/useContest";
 
-/* ------------------ Types ------------------ */
 interface Problem {
   id: number;
   display_id?: string;
@@ -26,7 +25,7 @@ interface PageData {
 
 /* ------------------ Component ------------------ */
 export default function ContestProblemsPage() {
-  const { id_contest } = useParams();
+  const { contest } = useContest();
   const [problems, setProblems] = useState<Problem[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -36,14 +35,15 @@ export default function ContestProblemsPage() {
 
   const PAGE_SIZE = 9;
 
-  /* -------- Fetch Problems -------- */
+
   useEffect(() => {
+    if (!contest) return;
     const fetchProblems = async () => {
       setLoading(true);
       setError(null);
       try {
         const res = await api.get<PageData>(
-          `/problem/list?Class=${id_contest}&page=${page}&page_size=${PAGE_SIZE}`
+          `/problem/list?Class=${contest?.id}&page=${page}&page_size=${PAGE_SIZE}`
         );
         const d = res.data;
         setProblems(d.listings || []);
@@ -57,7 +57,7 @@ export default function ContestProblemsPage() {
       }
     };
     fetchProblems();
-  }, [id_contest, page]);
+  }, [contest, page]);
 
   /* -------- Filtering -------- */
   const filtered = useMemo(
@@ -67,7 +67,6 @@ export default function ContestProblemsPage() {
     [problems, search]
   );
 
-  /* -------- UI State -------- */
   if (loading)
     return (
       <div className="flex flex-col justify-center items-center h-full text-gray-600 bg-[#f5f5f5]">
@@ -78,7 +77,6 @@ export default function ContestProblemsPage() {
 
   return (
     <div className="flex h-full flex-col bg-white border border-[#ccc] text-[#333333] font-mono select-none overflow-hidden">
-      {/* HEADER */}
       <header className="h-9 border-b border-[#ccc] bg-[#F3F3F3] flex items-center px-4 justify-between shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#616161]">
@@ -102,7 +100,6 @@ export default function ContestProblemsPage() {
         </div>
       </header>
 
-      {/* MAIN */}
       <main className="flex-1 overflow-auto">
         {error ? (
           <div className="flex items-center justify-center h-full text-red-600 text-[13px]">
@@ -138,7 +135,7 @@ export default function ContestProblemsPage() {
                     <td className="px-4 py-2 text-[#616161] text-[12px]">{idx + 1}</td>
                     <td className="px-4 py-2 font-bold truncate">
                       <Link
-                        href={`/problems/${id_contest}/${p.id}`}
+                        href={`/problems/${contest?.id}/${p.id}`}
                         className="text-[#005FB8] hover:underline decoration-[#005FB8]/30 underline-offset-2"
                       >
                         {p.title}

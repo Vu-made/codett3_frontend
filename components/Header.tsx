@@ -14,7 +14,7 @@ import {
   AccordionMenuItem,
   AccordionMenuLabel,
 } from "@/components/ui/accordion-menu";
-import { NotificationInbox , NotificationPayload } from "./NotificationInbox";
+import { NotificationInbox} from "./NotificationInbox";
 import { Alert, AlertIcon, AlertTitle } from "@/components/ui/alert";
 import { RiCheckboxCircleFill } from "@remixicon/react";
 import {
@@ -32,7 +32,6 @@ import {
   Menu,
 } from "lucide-react";
 import { toast } from "sonner";
-import { WSClient, WSMessage } from "@/lib/ws";
 
 const TabItem = [
   { title: "Trang chủ", icon: Home, url: "/" },
@@ -50,47 +49,14 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const [notifications, setNotifications] = useState<NotificationPayload[]>([]);
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) setMobileMenuOpen(false);
     };
-    console.log("🔍 API_URL at runtime:", process.env.NEXT_PUBLIC_API_URL);
-    console.log("🔍 WS_URL at runtime:", process.env.NEXT_PUBLIC_WS_URL);
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    if (!profile) return;
-    const fetchNotifications = async () => {
-      try {
-        const res = await api.get(`/notifications/`);
-        if (Array.isArray(res.data)) setNotifications(res.data);
-      } catch {
-        toast.error("Không thể tải thông báo", { position: "bottom-left" });
-      }
-    };
-    fetchNotifications();
-  }, [profile]);
-
-  useEffect(() => {
-    if (!profile) return;
-    const ws = new WSClient<NotificationPayload>({
-      path: "/ws/stream",
-      token: profile.ws_token,
-      onMessage: (data: WSMessage<NotificationPayload>) => {
-        const payload: NotificationPayload = data.data;
-        setNotifications((prev) => [payload, ...prev]);
-        toast.info(payload.message, { position: "bottom-left" });
-      },
-      onError: () => toast.error("Lỗi kết nối realtime", { position: "bottom-left" }),
-    });
-    ws.connect();
-    return () => ws.close();
-  }, [profile]);
 
   const handleLogout = async () => {
     try {
@@ -112,10 +78,6 @@ export default function Header() {
       </Alert>
     ));
 
-  const clearNotification = (index: number) =>
-    setNotifications((prev) => prev.filter((_, i) => i !== index));
-  const clearAllNotifications = () => setNotifications([]);
-
   if (loading) {
     return (
       <header className="w-full h-11 bg-[#f3f3f3] shadow-sm border-b border-gray-200 flex items-center justify-between px-4 md:px-6">
@@ -129,12 +91,11 @@ export default function Header() {
     );
   }
 
+  // --- UI giữ nguyên ---
   return (
     <>
       <header className="sticky top-0 z-40 w-full h-11 bg-[#f3f3f3] border-b border-gray-300 flex items-center justify-between px-4 md:px-3">
-        <div
-          className="flex items-center select-none transition-opacity"
-        >
+        <div className="flex items-center select-none transition-opacity">
           <Image src="/logo/5.png" width={120} height={5} alt="Logo" priority />
         </div>
 
@@ -162,12 +123,7 @@ export default function Header() {
         <div className="flex items-center gap-2 md:gap-3">
           {profile ? (
             <>
-              <NotificationInbox
-                notifications={notifications}
-                onClearOne={clearNotification}
-                onClearAll={clearAllNotifications}
-                setNotifications={setNotifications}
-              />
+              <NotificationInbox/>
 
               <div className="relative" ref={menuRef}>
                 <button
@@ -266,6 +222,7 @@ export default function Header() {
         </div>
       </header>
 
+      {/* Menu mobile giữ nguyên */}
       {mobileMenuOpen && profile && (
         <div
           ref={mobileMenuRef}

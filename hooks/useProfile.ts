@@ -8,6 +8,7 @@ export interface Profile {
     role: string;
     ws_token:string;
     full_name:string;
+    contest_is_joining:string;
 }
 
 export function useProfile() {

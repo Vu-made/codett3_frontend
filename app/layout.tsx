@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { TooltipProvider } from "@/components/ui/base-tooltip";
-import { headers } from "next/headers";
 import { Toaster } from "sonner";
-import PageTransition from "@/components/PageTransitionRootLayout";
+import MainContent from "./MainContent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,29 +32,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = await headers();
-  const ua = headersList.get("user-agent") || "";
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
-
   return (
-    <html lang="vi">
+    <html lang="vi" data-theme="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <TooltipProvider delay={300}>
-          <div className="flex flex-col h-full w-full">
-            <Header />
-
-            {isMobile && (
-              <div className="bg-yellow-100 text-yellow-900 text-center py-2 text-sm">
-                ⚠️ Ứng dụng này được tối ưu cho máy tính — bạn đang dùng điện thoại.
-              </div>
-            )}
-            <div className="h-full overflow-auto"> 
-              <PageTransition>
-                {children}
-              </PageTransition>
-            </div>
-            <Footer />
-          </div>
+          <MainContent>{children}</MainContent>
         </TooltipProvider>
         <Toaster /> 
       </body>

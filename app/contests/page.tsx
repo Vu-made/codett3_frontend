@@ -33,9 +33,7 @@ export default function ContestListPage() {
       try {
         const res = await api.get("/contest/list");
         setContests(res.data);
-      } catch (err) {
-        console.error("Lỗi tải danh sách kỳ thi:", err);
-      } finally {
+      }finally {
         setLoading(false);
       }
     };
